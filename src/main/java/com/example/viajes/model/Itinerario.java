@@ -16,6 +16,7 @@ public class Itinerario {
     private String fecha;
     private Double distancia;
 
+    //Aqui usamos la formula de haversine para calcular la distancia
     public Double getDistancia() {
         //Excepcion
         if (origen == null || destino == null) {
@@ -25,6 +26,19 @@ public class Itinerario {
         double lonOrigen = Math.toRadians(origen.getLongitud());
         double latDestino = Math.toRadians(destino.getLatitud());
         double lonDestino = Math.toRadians(destino.getLongitud());
+        //radio de la tierra 
+        final double RADIO_TIERRA = 6371.0;
+        //Diferencias de latitud y de longitud 
+        double deltaLat = latDestino - latOrigen;
+        double deltaLon = lonDestino - lonDestino;
+
+        //Haversine formula
+        double a = Math.sin(deltaLat /2) * Math.sin(deltaLat /2) 
+                + Math.cos(latOrigen) * Math.cos(latDestino) 
+                * Math.sin(deltaLon /2) * Math.sin(deltaLon /2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        double distancia = RADIO_TIERRA * c;
         return distancia;
     }
 }
