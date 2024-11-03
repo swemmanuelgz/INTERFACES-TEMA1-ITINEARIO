@@ -63,8 +63,8 @@ public class Main extends Application {
         imgMapa.setId("imgMapa");
         tableItinerario.setId("tableItinerario");
         //Images 
-        imgMapa.setFitHeight(200);
-        imgMapa.setFitWidth(200);
+        imgMapa.setFitHeight(250);
+        imgMapa.setFitWidth(250);
         //TextFields
         txtOrigen.setPromptText("Origen");
         txtDestino.setPromptText("Destino");
@@ -91,8 +91,15 @@ public class Main extends Application {
         //Añadir columnas a la tabla
         tableItinerario.getColumns().addAll(origenColumn, destinoColumn, fechaColumn, duracionColumn, precioColumn);
         //Poner elementos en la gridPane(5 columnas va tener para poder poner las cosas bien)
-        gridPane.add(lblTitulo, 3, 0);
-        gridPane.add(imgMapa, 3, 1);
+        gridPane.add(lblTitulo, 2, 0);
+        gridPane.add(imgMapa, 0, 4);
+        gridPane.add(lblOrigen,0,2 );
+        gridPane.add(txtOrigen, 1, 2); //los lbl y txt en la misma fila
+        gridPane.add(lblDestino, 2, 2);
+        gridPane.add(txtDestino, 3, 2);
+        gridPane.add(datePicker, 4, 2);//date picker tambien en la misma linea
+        gridPane.add(btnBuscar, 2, 3); //El boton abajo en el medio
+        gridPane.add(tableItinerario, 2, 4);
         
 
 
