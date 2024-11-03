@@ -15,6 +15,8 @@ public class Itinerario {
     private Provincia destino;
     private String fecha;
     private Double distancia;
+    private int duracion;
+    private double precio;
 
     //Aqui usamos la formula de haversine para calcular la distancia
     public Double getDistancia() {
@@ -30,7 +32,7 @@ public class Itinerario {
         final double RADIO_TIERRA = 6371.0;
         //Diferencias de latitud y de longitud 
         double deltaLat = latDestino - latOrigen;
-        double deltaLon = lonDestino - lonDestino;
+        double deltaLon = lonDestino - lonOrigen;
 
         //Haversine formula
         double a = Math.sin(deltaLat /2) * Math.sin(deltaLat /2) 
@@ -38,7 +40,29 @@ public class Itinerario {
                 * Math.sin(deltaLon /2) * Math.sin(deltaLon /2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-        double distancia = RADIO_TIERRA * c;
+         distancia = RADIO_TIERRA * c;
         return distancia;
     }
+
+    public int getDuracion() {
+        if (origen == null || destino == null) {
+            throw new RuntimeException("Origen o destino no establecidos");
+        }
+         double distanciaKm = getDistancia();
+         //Velocidad 
+         final double VELOCIDAD = 100.0;
+
+         //se calcula la duracion
+         double duracionHoras = distanciaKm / VELOCIDAD;
+         int duracionMin = (int) (duracionHoras * 60);
+
+        return duracionMin;
+    }
+
+    public double getPrecio() {
+        //Cuesta 3 € por km
+        precio =(distancia / 100) *3;
+        return precio;
+    }
+
 }
