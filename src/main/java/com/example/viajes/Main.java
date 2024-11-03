@@ -100,8 +100,7 @@ public class Main extends Application {
         gridPane.add(datePicker, 4, 2);//date picker tambien en la misma linea
         gridPane.add(btnBuscar, 2, 3); //El boton abajo en el medio
         gridPane.add(tableItinerario, 2, 4);
-        
-
+              
 
         scene.setRoot(gridPane);
         //Añadir textFields a la gridPane
