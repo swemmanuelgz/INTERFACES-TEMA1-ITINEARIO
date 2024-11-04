@@ -101,7 +101,7 @@ public class Main extends Application {
         tableItinerario.setPlaceholder(new Label("No se encontraron resultados"));
         //Columnas de la tabla 
         tableItinerario.setMaxHeight(150);
-        tableItinerario.setMinWidth(400);
+        tableItinerario.setMinWidth(470);
         TableColumn<Itinerario, String> origenColumn = new TableColumn<>("Origen");
         origenColumn.setCellValueFactory(new PropertyValueFactory<>("origenNombre"));
         TableColumn<Itinerario, String> destinoColumn = new TableColumn<>("Destino");
@@ -109,6 +109,7 @@ public class Main extends Application {
         TableColumn<Itinerario, String> fechaColumn = new TableColumn<>("Fecha");
         fechaColumn.setCellValueFactory(new PropertyValueFactory<>("fecha"));
         TableColumn<Itinerario, String> duracionColumn = new TableColumn<>("Duracion (minutos)");
+        duracionColumn.setMinWidth(150);
         duracionColumn.setCellValueFactory(new PropertyValueFactory<>("duracion"));
         TableColumn<Itinerario, String> precioColumn = new TableColumn<>("Precio (€)");
         precioColumn.setCellValueFactory(new PropertyValueFactory<>("precio"));	
