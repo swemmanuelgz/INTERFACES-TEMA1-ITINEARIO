@@ -7,4 +7,5 @@ module com.example.viajes {
 
     opens com.example.viajes to javafx.fxml, lombok;
     exports com.example.viajes;
+    exports com.example.viajes.model;
 }

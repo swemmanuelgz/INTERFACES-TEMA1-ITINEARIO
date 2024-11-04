@@ -1,18 +1,19 @@
 package com.example.viajes.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
 public class Provincia {
     private String nombre;
     private Double latitud;
     private Double longitud;
+
+    public Provincia() {
+        
+    }
+    public Provincia(String nombre, Double latitud, Double longitud) {
+        this.nombre = nombre;
+        this.latitud = latitud;
+        this.longitud = longitud;
+    }
 
     public String getNombre() {
         return nombre;

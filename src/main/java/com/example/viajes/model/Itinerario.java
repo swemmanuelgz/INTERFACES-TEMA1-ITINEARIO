@@ -1,14 +1,6 @@
 package com.example.viajes.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
 public class Itinerario {
 
     private Provincia origen;
@@ -17,6 +9,24 @@ public class Itinerario {
     private Double distancia;
     private int duracion;
     private double precio;
+
+    public Itinerario() {
+    }
+
+    public Itinerario(Provincia destino, Double distancia, int duracion, String fecha, Provincia origen, double precio) {
+        this.destino = destino;
+        this.distancia = distancia;
+        this.duracion = duracion;
+        this.fecha = fecha;
+        this.origen = origen;
+        this.precio = precio;
+    }
+
+    public Itinerario(Provincia destino, String fecha, Provincia origen) {
+        this.destino = destino;
+        this.fecha = fecha;
+        this.origen = origen;
+    }
 
     //Aqui usamos la formula de haversine para calcular la distancia
     public Double getDistancia() {
@@ -62,7 +72,52 @@ public class Itinerario {
     public double getPrecio() {
         //Cuesta 3 € por km
         precio =(distancia / 100) *3;
+        //Redondear a 2 decimales
+        precio = Math.round(precio * 100.0) / 100.0;
         return precio;
+    }
+
+    public void setOrigen(Provincia origen) {
+        this.origen = origen;
+    }
+
+    public void setDestino(Provincia destino) {
+        this.destino = destino;
+    }
+
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    }
+
+    public void setDistancia(Double distancia) {
+        this.distancia = distancia;
+    }
+
+    public void setDuracion(int duracion) {
+        this.duracion = duracion;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    public Provincia getOrigen() {
+        return origen;
+    }
+
+    public Provincia getDestino() {
+        return destino;
+    }
+
+    public String getFecha() {
+        return fecha;
+    }
+    public String getOrigenNombre() {
+        return origen != null ? origen.getNombre() : "";
+    }
+    
+    public String getDestinoNombre() {
+        return destino != null ? destino.getNombre() : "";
     }
 
 }
