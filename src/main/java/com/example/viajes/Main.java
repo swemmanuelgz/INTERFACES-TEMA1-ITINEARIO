@@ -69,7 +69,7 @@ public class Main extends Application {
 
         BorderPane root = new BorderPane();
         GridPane gridPane = new GridPane();
-        Scene scene = new Scene(gridPane, 900 , 700);
+        Scene scene = new Scene(gridPane, 900 , 500);
         scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
         //Ids de elementos para el CSS
         gridPane.setId("gridPane");
@@ -100,6 +100,8 @@ public class Main extends Application {
         //Tablewiew
         tableItinerario.setPlaceholder(new Label("No se encontraron resultados"));
         //Columnas de la tabla 
+        tableItinerario.setMaxHeight(150);
+        tableItinerario.setMinWidth(400);
         TableColumn<Itinerario, String> origenColumn = new TableColumn<>("Origen");
         origenColumn.setCellValueFactory(new PropertyValueFactory<>("origenNombre"));
         TableColumn<Itinerario, String> destinoColumn = new TableColumn<>("Destino");
