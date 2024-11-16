@@ -6,16 +6,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import com.example.viajes.controller.AlertasController;
+import com.example.viajes.controller.MainController;
+import com.example.viajes.excepciones.Excepciones;
 import com.example.viajes.model.Itinerario;
 import com.example.viajes.model.Provincia;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
@@ -29,6 +32,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -42,24 +46,31 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Main extends Application {
+        //Controladoras
+        private MainController mainController = new MainController();
+        private  AlertasController alertasController = new AlertasController();
+        //Controladora de Excepciones 
+        Excepciones excepciones = new Excepciones();
         //popup
         private Popup sugestiones = new Popup();
         //Lista
         private List<Provincia> provinciaList = new ArrayList<>();
         //TexztFields
-        private TextField txtOrigen = new TextField();
-        private TextField txtDestino = new TextField();
+        private final  TextField txtOrigen = new TextField();
+        private final TextField txtDestino = new TextField();
+        private final TextField txtViajeros = new TextField();
         //Labels 
-        private Label lblTitulo = new Label("BUSCAR ITINERARIO");
-        private Label lblOrigen = new Label("Origen");
-        private Label lblDestino = new Label("Destino");
+        private final Label lblTitulo = new Label("ITINERARIO");
+        private final  Label lblOrigen = new Label("Origen");
+        private final  Label lblDestino = new Label("Destino");
         //DatePicker
-        private DatePicker datePicker = new DatePicker();
+        private  DatePicker datePicker = new DatePicker();
         //Buttons
         private Button btnBuscar = new Button("Buscar");
+        private Button btnReservar = new Button("Reservar");
         //Imagen mapa de españa 
-        private Image image = new Image(getClass().getResource("img/mapa_spain.png").toExternalForm());
-        private ImageView imgMapa = new ImageView(image);
+        private final Image image = new Image(getClass().getResource("img/mapa_spain.png").toExternalForm());
+        private final ImageView imgMapa = new ImageView(image);
         
         //Tablewiew
         private TableView<Itinerario> tableItinerario = new TableView();
@@ -69,19 +80,29 @@ public class Main extends Application {
 
         BorderPane root = new BorderPane();
         GridPane gridPane = new GridPane();
-        Scene scene = new Scene(gridPane, 900 , 500);
-        scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+        gridPane.setHgap(10);
+        gridPane.setVgap(15);
+
+           
+        
+        
         //Ids de elementos para el CSS
         gridPane.setId("gridPane");
         lblTitulo.setId("lblTitulo");
+        lblTitulo.setPrefSize(250, 20);
         lblOrigen.setId("lblOrigen");
         lblDestino.setId("lblDestino");
+        txtDestino.setPrefSize(200, 20);
         txtOrigen.setId("txtOrigen");
+        txtOrigen.setPrefSize(200, 20);
         txtDestino.setId("txtDestino");
+        txtViajeros.setId("txtViajeros");
+        txtViajeros.setMaxWidth(75);
         datePicker.setId("datePicker");
         btnBuscar.setId("btnBuscar");
         imgMapa.setId("imgMapa");
         tableItinerario.setId("tableItinerario");
+        btnReservar.setId("btnReservar");
         //Images 
         imgMapa.setFitHeight(250);
         imgMapa.setFitWidth(250);
@@ -90,18 +111,20 @@ public class Main extends Application {
         txtOrigen.addEventFilter(KeyEvent.KEY_RELEASED, e -> showsuggestion(txtOrigen.getText()));
         txtDestino.setPromptText("Destino");
         txtDestino.addEventFilter(KeyEvent.KEY_RELEASED, e -> showsuggestionDestino(txtDestino.getText()));
+        txtViajeros.setPromptText("Nº Viajeros");
         //Labels
         lblOrigen.setText("Origen");
         lblDestino.setText("Destino");
         //DatePicker
         datePicker.setPromptText("Fecha");
+        datePicker.setEditable(false);
         //Buttons
         btnBuscar.setText("Buscar");
         //Tablewiew
         tableItinerario.setPlaceholder(new Label("No se encontraron resultados"));
         //Columnas de la tabla 
         tableItinerario.setMaxHeight(150);
-        tableItinerario.setMinWidth(470);
+        tableItinerario.setMinWidth(530);
         TableColumn<Itinerario, String> origenColumn = new TableColumn<>("Origen");
         origenColumn.setCellValueFactory(new PropertyValueFactory<>("origenNombre"));
         TableColumn<Itinerario, String> destinoColumn = new TableColumn<>("Destino");
@@ -112,56 +135,57 @@ public class Main extends Application {
         duracionColumn.setMinWidth(150);
         duracionColumn.setCellValueFactory(new PropertyValueFactory<>("duracion"));
         TableColumn<Itinerario, String> precioColumn = new TableColumn<>("Precio (€)");
-        precioColumn.setCellValueFactory(new PropertyValueFactory<>("precio"));	
+        precioColumn.setCellValueFactory(new PropertyValueFactory<>("precio"));
+
+        TableColumn<Itinerario, String> horaColumn = new TableColumn<>("H");
+        horaColumn.setCellValueFactory(new PropertyValueFactory<>("hora"));	
         //Añadir columnas a la tabla
-        tableItinerario.getColumns().addAll(origenColumn, destinoColumn, fechaColumn, duracionColumn, precioColumn);
+        tableItinerario.getColumns().addAll(origenColumn, destinoColumn, fechaColumn, duracionColumn, precioColumn,horaColumn);
         //Poner elementos en la gridPane(5 columnas va tener para poder poner las cosas bien)
         gridPane.add(lblTitulo, 2, 0);
-        gridPane.add(imgMapa, 0, 4);
+        gridPane.add(imgMapa, 0, 4,2,5);
         gridPane.add(lblOrigen,0,2 );
         gridPane.add(txtOrigen, 1, 2); //los lbl y txt en la misma fila
         gridPane.add(lblDestino, 2, 2);
         gridPane.add(txtDestino, 3, 2);
         gridPane.add(datePicker, 4, 2);//date picker tambien en la misma linea
+        gridPane.add(txtViajeros, 4, 3);
         gridPane.add(btnBuscar, 2, 3); //El boton abajo en el medio
-        gridPane.add(tableItinerario, 2, 4);
-        
+        gridPane.add(tableItinerario, 2, 4, 2, 5);
+        gridPane.add(btnReservar, 4,9);
+
+
+
+        Scene scene = new Scene(gridPane, 900 , 600);
+        scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
         scene.setRoot(gridPane);
 
-
+        //controles de entrada de textos
+        mainController.onlyNumbers(txtViajeros);
+        
         btnBuscar.setOnAction(e -> {
+            excepciones.notSetOriginOrDestinationOrDate(txtOrigen, txtDestino, datePicker, txtViajeros);
+            excepciones.notSetOriginOrDestination(txtOrigen, txtDestino);
+            excepciones.notSetViajeros(txtViajeros);
             String origen = txtOrigen.getText();
             String destino = txtDestino.getText();
             String fecha = datePicker.getValue().toString();
             Provincia provinciaOrigen = new Provincia();
             Provincia provinciaDestino = new Provincia();
+            int viajeros = Integer.parseInt(txtViajeros.getText());
             int contador =0;
-
-            
-                try {
-                    for (int i = 0; i < getProvinciasList().size(); i++) {
-                        //Conseguimos el objeto de origen
-                        if (getProvinciasList().get(i).getNombre().toLowerCase().equals(origen.toLowerCase())) {
-                            provinciaOrigen = getProvinciasList().get(i);
-                            contador++;
-                        }
-                        //Ahora el destino 
-                        if (getProvinciasList().get(i).getNombre().toLowerCase().equals(destino.toLowerCase())) {
-                            provinciaDestino = getProvinciasList().get(i);
-                            contador++;
-                        }
-                        if (contador==2) {
-                            //Rompemos el bucle al construir los dos objetos 
-                            break;
-                        }
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            
-
-            //tableItinerario.getItems().clear();
-            tableItinerario.getItems().add(new Itinerario(provinciaDestino, fecha, provinciaOrigen));
+            try {
+                mainController.getTableItinerario(tableItinerario, origen, destino, fecha, provinciaOrigen, provinciaDestino, viajeros, getProvinciasList());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+               
+        });
+        btnReservar.setOnAction(e -> {
+           Itinerario itinerario = tableItinerario.getSelectionModel().getSelectedItem();
+           excepciones.noDataInTable(itinerario);
+           mainController.generateItinerarioTicket(itinerario);
+           
         });
 
         stage.setTitle("Itinerario");
@@ -254,38 +278,7 @@ public class Main extends Application {
     }
     //con esto obtenemos las provincias del fichero
     public ArrayList<Provincia> getProvinciasList() throws IOException{
-        ArrayList<Provincia> provincias = new ArrayList<>();
-        File archivo = new File("src/main/java/com/example/viajes/model/provincias.txt");
-        try(BufferedReader bf = new BufferedReader(new FileReader(archivo))) {
-            String linea;
-            while ((linea = bf.readLine()) != null) {
-                String [] partes =linea.split(":");
-                if (partes.length <2) {
-                    continue; //Aseguramos que el nombre de la provincia exista
-                }
-                String nombre = partes[0];
-                //latitud y longitud se obtienen de la linea
-                String[] coordenadas =  partes[1].split(",");
-                if (coordenadas.length <2) {
-                    continue; //Aseguramos que las coordenadas existan
-                }
-
-                //Otro try 
-                try {
-                    double latitud = Double.parseDouble(coordenadas[0]);
-                    double longitud = Double.parseDouble(coordenadas[1]);
-                    Provincia provincia = new Provincia(nombre, latitud, longitud);
-                    //Añadimos la provincia a la lista 
-                    provincias.add(provincia);
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-            
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        ArrayList<Provincia> provincias = mainController.getProvinciasList();
 
         return provincias;
     }
