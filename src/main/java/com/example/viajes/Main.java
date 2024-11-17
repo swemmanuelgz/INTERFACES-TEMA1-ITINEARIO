@@ -71,6 +71,9 @@ public class Main extends Application {
         //Imagen mapa de españa 
         private final Image image = new Image(getClass().getResource("img/mapa_spain.png").toExternalForm());
         private final ImageView imgMapa = new ImageView(image);
+
+        //Boolean 
+        private boolean activeThread = false;
         
         //Tablewiew
         private TableView<Itinerario> tableItinerario = new TableView();
@@ -193,6 +196,7 @@ public class Main extends Application {
         stage.setResizable(false);
         stage.show();
     }
+    
 
     private void showsuggestion(String input ){
         
@@ -285,4 +289,6 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch();
     }
+
+    
 }

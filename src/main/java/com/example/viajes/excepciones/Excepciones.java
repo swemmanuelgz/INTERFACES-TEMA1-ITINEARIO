@@ -36,8 +36,9 @@ public class Excepciones {
     public  void noDataInTable(Itinerario itinerario) {
         if (itinerario == null) {
             alertas.alertaInformativa("No hay datos en la tabla", "Error", "Error de datos");
+            throw new RuntimeException("No hay datos en la tabla");
         }
-        throw new RuntimeException("No hay datos en la tabla");
+        
     }
     
 }

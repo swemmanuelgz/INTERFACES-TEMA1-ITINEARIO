@@ -45,7 +45,7 @@ public class Itinerario {
         this.origen = origen;
         this.precio = precio;
         this.viajeros = viajeros;
-        this.hora = getHora();
+        
 
     }
 

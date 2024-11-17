@@ -169,6 +169,13 @@ public class MainController {
                     tableItinerario.getItems().add(new Itinerario(provinciaDestino, fecha, provinciaOrigen, viajeros));
                 }
     }
+    private void tableUpdateThread(Boolean activeThread, TableView<Itinerario> tableItinerario) {
+        
+        while (activeThread) {
+            
+        }
+
+    }
     public void generateItinerarioTicket(Itinerario itinerario) {
         AlertasController alertas = new AlertasController();
         String titulo = "BILLETE COMPRADO!";
