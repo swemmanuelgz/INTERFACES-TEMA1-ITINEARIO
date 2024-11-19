@@ -5,7 +5,6 @@ Almería: 36.8340, -2.4637
 Asturias: 43.3619, -5.8494
 Ávila: 40.6576, -4.7162
 Badajoz: 38.8794, -6.9707
-Baleares: 39.6953, 3.0176
 Barcelona: 41.3851, 2.1734
 Burgos: 42.3439, -3.6969
 Cáceres: 39.4767, -6.3722
@@ -36,7 +35,6 @@ Orense: 42.3364, -7.8638
 Palencia: 42.0095, -4.5280
 Pontevedra: 42.4336, -8.6476
 Salamanca: 40.9701, -5.6635
-Santa Cruz de Tenerife: 28.4636, -16.2518
 Segovia: 40.9429, -4.1088
 Sevilla: 37.3886, -5.9823
 Soria: 41.7640, -2.4688
