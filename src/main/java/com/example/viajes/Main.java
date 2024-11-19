@@ -34,13 +34,14 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -71,105 +72,40 @@ public class Main extends Application {
         //Imagen mapa de españa 
         private final Image image = new Image(getClass().getResource("img/mapa_spain.png").toExternalForm());
         private final ImageView imgMapa = new ImageView(image);
-
+        //WEbView
+        String URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13333323.036969548!2d-17.577018371966222!3d35.325710170526584!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xc42e3783261bc8b%3A0xa6ec2c940768a3ec!2zRXNwYcOxYQ!5e0!3m2!1ses!2ses!4v1731862664842!5m2!1ses!2ses";
+        private final WebView webView = new WebView();
+        private final WebEngine engine = webView.getEngine();
+        
         //Boolean 
-        private boolean activeThread = false;
+        private boolean activeThread = true;
         
         //Tablewiew
         private TableView<Itinerario> tableItinerario = new TableView();
     @Override
     public void start(Stage stage) throws IOException {
         provinciaList = getProvinciasList();
-
+        engine.load(getClass().getResource("/html/map.html").toExternalForm());
         BorderPane root = new BorderPane();
-        GridPane gridPane = new GridPane();
-        gridPane.setHgap(10);
-        gridPane.setVgap(15);
-
-           
         
-        
-        //Ids de elementos para el CSS
-        gridPane.setId("gridPane");
-        lblTitulo.setId("lblTitulo");
-        lblTitulo.setPrefSize(250, 20);
-        lblOrigen.setId("lblOrigen");
-        lblDestino.setId("lblDestino");
-        txtDestino.setPrefSize(200, 20);
-        txtOrigen.setId("txtOrigen");
-        txtOrigen.setPrefSize(200, 20);
-        txtDestino.setId("txtDestino");
-        txtViajeros.setId("txtViajeros");
-        txtViajeros.setMaxWidth(75);
-        datePicker.setId("datePicker");
-        btnBuscar.setId("btnBuscar");
-        imgMapa.setId("imgMapa");
-        tableItinerario.setId("tableItinerario");
-        btnReservar.setId("btnReservar");
-        //Images 
-        imgMapa.setFitHeight(250);
-        imgMapa.setFitWidth(250);
-        //TextFields
-        txtOrigen.setPromptText("Origen");
-        txtOrigen.addEventFilter(KeyEvent.KEY_RELEASED, e -> showsuggestion(txtOrigen.getText()));
-        txtDestino.setPromptText("Destino");
-        txtDestino.addEventFilter(KeyEvent.KEY_RELEASED, e -> showsuggestionDestino(txtDestino.getText()));
-        txtViajeros.setPromptText("Nº Viajeros");
-        //Labels
-        lblOrigen.setText("Origen");
-        lblDestino.setText("Destino");
-        //DatePicker
-        datePicker.setPromptText("Fecha");
-        datePicker.setEditable(false);
-        //Buttons
-        btnBuscar.setText("Buscar");
-        //Tablewiew
-        tableItinerario.setPlaceholder(new Label("No se encontraron resultados"));
-        //Columnas de la tabla 
-        tableItinerario.setMaxHeight(150);
-        tableItinerario.setMinWidth(530);
-        TableColumn<Itinerario, String> origenColumn = new TableColumn<>("Origen");
-        origenColumn.setCellValueFactory(new PropertyValueFactory<>("origenNombre"));
-        TableColumn<Itinerario, String> destinoColumn = new TableColumn<>("Destino");
-        destinoColumn.setCellValueFactory(new PropertyValueFactory<>("destinoNombre"));
-        TableColumn<Itinerario, String> fechaColumn = new TableColumn<>("Fecha");
-        fechaColumn.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-        TableColumn<Itinerario, String> duracionColumn = new TableColumn<>("Duracion (minutos)");
-        duracionColumn.setMinWidth(150);
-        duracionColumn.setCellValueFactory(new PropertyValueFactory<>("duracion"));
-        TableColumn<Itinerario, String> precioColumn = new TableColumn<>("Precio (€)");
-        precioColumn.setCellValueFactory(new PropertyValueFactory<>("precio"));
 
-        TableColumn<Itinerario, String> horaColumn = new TableColumn<>("H");
-        horaColumn.setCellValueFactory(new PropertyValueFactory<>("hora"));	
-        //Añadir columnas a la tabla
-        tableItinerario.getColumns().addAll(origenColumn, destinoColumn, fechaColumn, duracionColumn, precioColumn,horaColumn);
-        //Poner elementos en la gridPane(5 columnas va tener para poder poner las cosas bien)
-        gridPane.add(lblTitulo, 2, 0);
-        gridPane.add(imgMapa, 0, 4,2,5);
-        gridPane.add(lblOrigen,0,2 );
-        gridPane.add(txtOrigen, 1, 2); //los lbl y txt en la misma fila
-        gridPane.add(lblDestino, 2, 2);
-        gridPane.add(txtDestino, 3, 2);
-        gridPane.add(datePicker, 4, 2);//date picker tambien en la misma linea
-        gridPane.add(txtViajeros, 4, 3);
-        gridPane.add(btnBuscar, 2, 3); //El boton abajo en el medio
-        gridPane.add(tableItinerario, 2, 4, 2, 5);
-        gridPane.add(btnReservar, 4,9);
-
-
-
-        Scene scene = new Scene(gridPane, 900 , 600);
+        Scene scene = new Scene(setItemsGridPane(), 900 , 600);
         scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-        scene.setRoot(gridPane);
+        scene.setRoot(setItemsGridPane());
 
-        //controles de entrada de textos
+        //controles de entrada de textos FALTAN MAS CONTROLES
+        mainController.onlyLetters(txtOrigen);
+        mainController.onlyLetters(txtDestino);
         mainController.onlyNumbers(txtViajeros);
+
+        //Thread
+        //mainController.tableUpdateThread( tableItinerario);
         
-        btnBuscar.setOnAction(e -> {
+        btnBuscar.setOnAction(e -> { 
             excepciones.notSetOriginOrDestinationOrDate(txtOrigen, txtDestino, datePicker, txtViajeros);
             excepciones.notSetOriginOrDestination(txtOrigen, txtDestino);
             excepciones.notSetViajeros(txtViajeros);
+            mainController.stopTableThread();
             String origen = txtOrigen.getText();
             String destino = txtDestino.getText();
             String fecha = datePicker.getValue().toString();
@@ -197,7 +133,7 @@ public class Main extends Application {
         stage.show();
     }
     
-
+    
     private void showsuggestion(String input ){
         
         if (input.isEmpty()) {
@@ -281,10 +217,90 @@ public class Main extends Application {
         
     }
     //con esto obtenemos las provincias del fichero
-    public ArrayList<Provincia> getProvinciasList() throws IOException{
+    private  ArrayList<Provincia> getProvinciasList() throws IOException{
+
         ArrayList<Provincia> provincias = mainController.getProvinciasList();
 
         return provincias;
+    }
+    public GridPane setItemsGridPane(){
+        GridPane gridPane = new GridPane();
+        
+        gridPane.setHgap(10);
+        gridPane.setVgap(15);
+
+           
+        
+        
+        //Ids de elementos para el CSS
+        gridPane.setId("gridPane");
+        lblTitulo.setId("lblTitulo");
+        lblTitulo.setPrefSize(250, 20);
+        lblOrigen.setId("lblOrigen");
+        lblDestino.setId("lblDestino");
+        txtDestino.setPrefSize(200, 20);
+        txtOrigen.setId("txtOrigen");
+        txtOrigen.setPrefSize(200, 20);
+        txtDestino.setId("txtDestino");
+        txtViajeros.setId("txtViajeros");
+        txtViajeros.setMaxWidth(75);
+        datePicker.setId("datePicker");
+        btnBuscar.setId("btnBuscar");
+        imgMapa.setId("imgMapa");
+        tableItinerario.setId("tableItinerario");
+        btnReservar.setId("btnReservar");
+        //Images 
+        imgMapa.setFitHeight(250);
+        imgMapa.setFitWidth(250);
+        //TextFields
+        txtOrigen.setPromptText("Origen");
+        txtOrigen.addEventFilter(KeyEvent.KEY_RELEASED, e -> showsuggestion(txtOrigen.getText()));
+        txtDestino.setPromptText("Destino");
+        txtDestino.addEventFilter(KeyEvent.KEY_RELEASED, e -> showsuggestionDestino(txtDestino.getText()));        
+        txtViajeros.setPromptText("Nº Viajeros");
+        //Labels
+        lblOrigen.setText("Origen");
+        lblDestino.setText("Destino");
+        //DatePicker
+        datePicker.setPromptText("Fecha");
+        datePicker.setEditable(false);
+        mainController.dateController(datePicker);
+        //Buttons
+        btnBuscar.setText("Buscar");
+        //Tablewiew
+        tableItinerario.setPlaceholder(new Label("No se encontraron resultados"));
+        //Columnas de la tabla 
+        tableItinerario.setMaxHeight(150);
+        tableItinerario.setMinWidth(530);
+        TableColumn<Itinerario, String> origenColumn = new TableColumn<>("Origen");
+        origenColumn.setCellValueFactory(new PropertyValueFactory<>("origenNombre"));
+        TableColumn<Itinerario, String> destinoColumn = new TableColumn<>("Destino");
+        destinoColumn.setCellValueFactory(new PropertyValueFactory<>("destinoNombre"));
+        TableColumn<Itinerario, String> fechaColumn = new TableColumn<>("Fecha");
+        fechaColumn.setCellValueFactory(new PropertyValueFactory<>("fecha"));
+        TableColumn<Itinerario, String> duracionColumn = new TableColumn<>("Duracion (minutos)");
+        duracionColumn.setMinWidth(150);
+        duracionColumn.setCellValueFactory(new PropertyValueFactory<>("duracion"));
+        TableColumn<Itinerario, String> precioColumn = new TableColumn<>("Precio (€)");
+        precioColumn.setCellValueFactory(new PropertyValueFactory<>("precio"));
+
+        TableColumn<Itinerario, String> horaColumn = new TableColumn<>("H");
+        horaColumn.setCellValueFactory(new PropertyValueFactory<>("hora"));	
+        //Añadir columnas a la tabla
+        tableItinerario.getColumns().addAll(origenColumn, destinoColumn, fechaColumn, duracionColumn, precioColumn,horaColumn);
+        //Poner elementos en la gridPane(5 columnas va tener para poder poner las cosas bien)
+        gridPane.add(lblTitulo, 2, 0);
+        gridPane.add(webView, 0, 4,2,5);
+        gridPane.add(lblOrigen,0,2 );
+        gridPane.add(txtOrigen, 1, 2); //los lbl y txt en la misma fila
+        gridPane.add(lblDestino, 2, 2);
+        gridPane.add(txtDestino, 3, 2);
+        gridPane.add(datePicker, 4, 2);//date picker tambien en la misma linea
+        gridPane.add(txtViajeros, 4, 3);
+        gridPane.add(btnBuscar, 2, 3); //El boton abajo en el medio
+        gridPane.add(tableItinerario, 2, 4, 2, 5);
+        gridPane.add(btnReservar, 4,9);
+        return gridPane;
     }
     public static void main(String[] args) {
         launch();

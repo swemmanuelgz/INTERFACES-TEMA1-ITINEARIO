@@ -3,6 +3,10 @@ module com.example.viajes {
     requires javafx.fxml;
     requires javafx.graphics;
     requires lombok;
+    requires javafx.web;
+    
+    
+    
     
 
 

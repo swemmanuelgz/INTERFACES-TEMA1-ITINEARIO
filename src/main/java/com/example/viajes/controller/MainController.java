@@ -4,24 +4,32 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.example.viajes.model.Itinerario;
 import com.example.viajes.model.Provincia;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Popup;
 
 public class MainController {
+    private volatile  boolean activeThread = true;
 
+    public void stopTableThread(){
+        activeThread = false;
+    }
     public ArrayList<Provincia> getProvinciasList(ArrayList<Provincia> provincias) throws IOException {
         File archivo = new File("src/main/java/com/example/viajes/model/provincias.txt");
         try (BufferedReader bf = new BufferedReader(new FileReader(archivo))) {
@@ -57,15 +65,15 @@ public class MainController {
         return provincias;
     }
 
-    private void showsuggestionDestino(String input, ArrayList<Provincia> provinciaList, TextField txtDestino,
-            TextField txtOrigen, Popup sugestiones) {
+    public void showsuggestionDestino(String input, TextField txtDestino,
+            TextField txtOrigen, Popup sugestiones) throws IOException {
 
         if (input.isEmpty()) {
             sugestiones.hide();
             return;
         }
         // Filtra las provincias
-        List<String> provinciasFiltradas = provinciaList.stream()
+        List<String> provinciasFiltradas = getProvinciasList().stream()
                 .map(Provincia::getNombre)
                 .filter(nombre -> nombre.toLowerCase().contains(input.toLowerCase()))
                 .collect(Collectors.toList());
@@ -169,12 +177,57 @@ public class MainController {
                     tableItinerario.getItems().add(new Itinerario(provinciaDestino, fecha, provinciaOrigen, viajeros));
                 }
     }
-    private void tableUpdateThread(Boolean activeThread, TableView<Itinerario> tableItinerario) {
+    public void tableUpdateThread( TableView<Itinerario> tableItinerario) throws IOException {
         
-        while (activeThread) {
+        String fecha = LocalDate.now().toString();
+        int contador = 0;
+        //Orense va ser siempre la provincia de origen del bucle
+        
+        for (int i = 0; i < getProvinciasList().size(); i++) {
+            if (getProvinciasList().get(i).getNombre().equalsIgnoreCase("Orense")) {
+                //Orense = getProvinciasList().get(i);
+                break; 
+            }
+            contador++;
+        }
+        Provincia Orense = getProvinciasList().get(contador);
+        
+        if (Orense == null) {
+            System.out.println("Provincia de Orense no encontrada.");
+            return;
+        }
+        Random random = new Random();
+        //Actualiza la tabla cada  segundos con rutas de ourense a otras provincias
+        new Thread(() -> {
+        while (activeThread == true) {
+            try {
+                Platform.runLater(()->{
+                    tableItinerario.getItems().clear();
+                    
+                        try {
+                            for (int i = 0; i < 4; i++) {
+                                //Cogemos un destino random de las provincias
+                            Provincia destino = getProvinciasList().get(random.nextInt(getProvinciasList().size()));
+                                //Comprobamos que no sea Orense
+                                if (destino.getNombre().equalsIgnoreCase("Orense")) {
+                                    return;
+                                }
+                            tableItinerario.getItems().add(new Itinerario(destino, fecha, Orense, 1));
+                            }
+                            tableItinerario.refresh();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    
+                });
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                break;
+            }
             
         }
-
+      }).start();
     }
     public void generateItinerarioTicket(Itinerario itinerario) {
         AlertasController alertas = new AlertasController();
@@ -202,11 +255,35 @@ public class MainController {
  
          
     }
-    public void onlyLetters(KeyEvent keyEvent,TextField txtOrigen) {
-        char c = keyEvent.getCharacter().charAt(0);
-        if (!Character.isLetter(c)) {
-            keyEvent.consume();
-        }
+    public void onlyLetters(TextField txtField) {
+        txtField.setTextFormatter(new TextFormatter<String>(change -> {
+            String nuevoTexto = change.getControlNewText();
+            // Permitir solo letras (incluyendo espacio) o la cadena vacía para borrar
+            if (nuevoTexto.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]*")) { // Incluye letras y espacios
+                return change;
+            }
+            return null; // Rechaza el cambio si no es una letra o espacio
+        }));
+    }
+    public DatePicker dateController(DatePicker datePicker) {
+        //Comprobamos que la fecha no sea anterior a la actual y que el billete no
+        //Se pueda comprar con mas de dos meses de antelacion
+        datePicker.setDayCellFactory( picker -> new DateCell(){
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                //Esto es la fecha de hoy 
+                LocalDate today = LocalDate.now();
+                //Este el limite de dos meses a partir de hoy
+                LocalDate limitDate = today.plusMonths(2);
+                //Deshabilitamos las fechas anteriores a la actual y despues de dos meses
+                if (date.isBefore(today) || date.isAfter(limitDate)) {
+                    setVisible(true);
+                    setStyle("-fx-background-color: #ffc0cb;");
+                }
+            }
+        });
+        return datePicker;
     }
 
     
