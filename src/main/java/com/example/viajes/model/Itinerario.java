@@ -100,9 +100,11 @@ public class Itinerario {
     public double getPrecio() {
         //Cuesta 3 € por km
         precio =(distancia / 100) *3;
+        
+        
+        precio = precio * viajeros;
         //Redondear a 2 decimales
         precio = Math.round(precio * 100.0) / 100.0;
-        precio = precio * viajeros;
         return precio;
     }
 
@@ -147,6 +149,11 @@ public class Itinerario {
     
     public String getDestinoNombre() {
         return destino != null ? destino.getNombre() : "";
+    }
+    public void validacionTabla(){
+        if (destino.equals(null) || origen.equals(null) || fecha.equals(null) || viajeros == 0) {
+            throw new RuntimeException("Faltan datos");
+        }
     }
 
     @Override

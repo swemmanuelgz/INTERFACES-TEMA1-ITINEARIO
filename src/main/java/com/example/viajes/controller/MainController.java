@@ -6,30 +6,40 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
+import com.example.viajes.Main;
 import com.example.viajes.model.Itinerario;
 import com.example.viajes.model.Provincia;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
-import javafx.stage.Popup;
 
 public class MainController {
     private volatile  boolean activeThread = true;
+    private Itinerario modelo;
+    private Main vista;
 
+    public Itinerario getModelo() {
+        return modelo;
+    }
+    public void setModelo(Itinerario modelo) {
+        this.modelo = modelo;
+    }
+    public Main getVista() {
+        return vista;
+    }
+    public void setVista(Main vista) {
+        this.vista = vista;
+    }
     public void stopTableThread(){
         activeThread = false;
     }
+    //Recupera las provincias de un fichero
     public ArrayList<Provincia> getProvinciasList(ArrayList<Provincia> provincias) throws IOException {
         File archivo = new File("src/main/java/com/example/viajes/model/provincias.txt");
         try (BufferedReader bf = new BufferedReader(new FileReader(archivo))) {
@@ -65,48 +75,7 @@ public class MainController {
         return provincias;
     }
 
-    public void showsuggestionDestino(String input, TextField txtDestino,
-            TextField txtOrigen, Popup sugestiones) throws IOException {
-
-        if (input.isEmpty()) {
-            sugestiones.hide();
-            return;
-        }
-        // Filtra las provincias
-        List<String> provinciasFiltradas = getProvinciasList().stream()
-                .map(Provincia::getNombre)
-                .filter(nombre -> nombre.toLowerCase().contains(input.toLowerCase()))
-                .collect(Collectors.toList());
-
-        if (provinciasFiltradas.isEmpty()) {
-            sugestiones.hide();
-            return;
-        }
-        // Creamos un ListView
-        ListView<String> listView = new ListView<>();
-        ObservableList<String> items = FXCollections.observableArrayList(provinciasFiltradas);
-        listView.setItems(items);
-
-        listView.setOnMouseClicked(Event -> {
-            if (!listView.getSelectionModel().isEmpty()) {
-                String selected = listView.getSelectionModel().getSelectedItem();
-                txtDestino.setText(selected);
-                sugestiones.hide();
-            }
-        });
-
-        // tamaño del popup
-        listView.setPrefHeight(Math.min(provinciasFiltradas.size(), 5) * 24); // maximo elementos muestra
-        sugestiones.getContent().clear();
-        sugestiones.getContent().add(listView);
-
-        if (!sugestiones.isShowing()) {
-            sugestiones.show(txtOrigen,
-                    txtDestino.localToScreen(txtDestino.getBoundsInLocal()).getMinX(),
-                    txtDestino.localToScreen(txtDestino.getBoundsInLocal()).getMaxY());
-        }
-
-    }
+  
 
     // Función para obtener la lista de provincias
     public ArrayList<Provincia> getProvinciasList() throws IOException {
@@ -146,36 +115,16 @@ public class MainController {
     }
 
     
+    //Metodo tabla
+    public void getTableItinerario()throws IOException {
+            
+                //  validaciohn de los campos del formul,ario 
+                  modelo.validacionTabla();
 
-    public void getTableItinerario(TableView<Itinerario> tableItinerario, String origen, String destino, String fecha,
-            Provincia provinciaOrigen, Provincia provinciaDestino, int viajeros, ArrayList<Provincia> provinciasList) {
-                int contador = 0;
-                tableItinerario.getItems().clear();
-                try {
-                    for (int i = 0; i < getProvinciasList().size(); i++) {
-                        // Conseguimos el objeto de origen
-                        if (getProvinciasList().get(i).getNombre().toLowerCase().equals(origen.toLowerCase())) {
-                            provinciaOrigen = getProvinciasList().get(i);
-                            contador++;
-                        }
-                        // Ahora el destino
-                        if (getProvinciasList().get(i).getNombre().toLowerCase().equals(destino.toLowerCase())) {
-                            provinciaDestino = getProvinciasList().get(i);
-                            contador++;
-                        }
-                        if (contador == 2) {
-                            // Rompemos el bucle al construir los dos objetos
-                            break;
-                        }
-                    }
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-        
-                // tableItinerario.getItems().clear();
-                for (int i = 0; i < 4; i++) {
-                    tableItinerario.getItems().add(new Itinerario(provinciaDestino, fecha, provinciaOrigen, viajeros));
-                }
+                  //si true
+                  vista.setTable();
+
+                
     }
     public void tableUpdateThread( TableView<Itinerario> tableItinerario) throws IOException {
         

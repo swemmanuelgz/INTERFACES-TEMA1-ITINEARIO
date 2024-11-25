@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -99,7 +100,7 @@ public class Main extends Application {
         mainController.onlyNumbers(txtViajeros);
 
         //Thread
-        //mainController.tableUpdateThread( tableItinerario);
+        mainController.tableUpdateThread( tableItinerario);
         
         btnBuscar.setOnAction(e -> { 
             excepciones.notSetOriginOrDestinationOrDate(txtOrigen, txtDestino, datePicker, txtViajeros);
@@ -112,11 +113,28 @@ public class Main extends Application {
             Provincia provinciaOrigen = new Provincia();
             Provincia provinciaDestino = new Provincia();
             int viajeros = Integer.parseInt(txtViajeros.getText());
+
+            for (Provincia provincia : provinciaList) {
+                if (provincia.getNombre().equals(origen)) {
+                    provinciaOrigen = provincia;
+                }
+                if (provincia.getNombre().equals(destino)) {
+                    provinciaDestino = provincia;
+                }
+            }
+
+            Itinerario itinerario=null;
+            
+                itinerario = new Itinerario(provinciaDestino, fecha, provinciaOrigen, viajeros);
+           
+            mainController.setModelo(itinerario);
+            mainController.setVista(this);
+
             int contador =0;
             try {
-                mainController.getTableItinerario(tableItinerario, origen, destino, fecha, provinciaOrigen, provinciaDestino, viajeros, getProvinciasList());
+                mainController.getTableItinerario();
             } catch (IOException e1) {
-                e1.printStackTrace();
+                System.out.println("Error al cargar la tabla  "+e1.getMessage());
             }
                
         });
@@ -175,6 +193,16 @@ public class Main extends Application {
             }
         
     }
+    public void setTable(){
+         tableItinerario.getItems().clear();
+               try {
+                for (int i = 0; i < 4; i++) {
+                    tableItinerario.getItems().add(mainController.getModelo());
+                }
+               } catch (Exception e) {
+                System.out.println("Error al cargar la tabla"+e.getMessage());
+               }
+    }
     private void showsuggestionDestino(String input ){
         
         if (input.isEmpty()) {
@@ -223,85 +251,115 @@ public class Main extends Application {
 
         return provincias;
     }
-    public GridPane setItemsGridPane(){
+    public GridPane setItemsGridPane() {
         GridPane gridPane = new GridPane();
-        
-        gridPane.setHgap(10);
-        gridPane.setVgap(15);
-
-           
-        
-        
-        //Ids de elementos para el CSS
-        gridPane.setId("gridPane");
+    
+        gridPane.setHgap(8); // Espacio horizontal entre elementos
+        gridPane.setVgap(12); // Espacio vertical entre filas
+        gridPane.setPadding(new Insets(20, 20, 20, 20)); // Márgenes del gridpane
+    
+        // Configurar columnas para un diseño más controlado
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(20); // Ancho para etiquetas y el WebView
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(30); // Ancho para campos de texto
+        ColumnConstraints col3 = new ColumnConstraints();
+        col3.setPercentWidth(30); // Ancho para campos adicionales
+        ColumnConstraints col4 = new ColumnConstraints();
+        col4.setPercentWidth(20); // Espacio para botones u otros elementos
+        gridPane.getColumnConstraints().addAll(col1, col2, col3, col4);
+    
+        // Configuración de etiquetas
         lblTitulo.setId("lblTitulo");
-        lblTitulo.setPrefSize(250, 20);
+        lblTitulo.setAlignment(Pos.CENTER);
+        lblTitulo.setPrefSize(300, 30); // Tamaño del título
+    
         lblOrigen.setId("lblOrigen");
+        lblOrigen.setMinWidth(80); // Ancho mínimo para que no se recorte
+        lblOrigen.setAlignment(Pos.CENTER_RIGHT); // Alineación a la derecha
+    
         lblDestino.setId("lblDestino");
-        txtDestino.setPrefSize(200, 20);
+        lblDestino.setMinWidth(80);
+        lblDestino.setAlignment(Pos.CENTER_RIGHT);
+    
+        // Configuración de campos de texto
         txtOrigen.setId("txtOrigen");
-        txtOrigen.setPrefSize(200, 20);
-        txtDestino.setId("txtDestino");
-        txtViajeros.setId("txtViajeros");
-        txtViajeros.setMaxWidth(75);
-        datePicker.setId("datePicker");
-        btnBuscar.setId("btnBuscar");
-        imgMapa.setId("imgMapa");
-        tableItinerario.setId("tableItinerario");
-        btnReservar.setId("btnReservar");
-        //Images 
-        imgMapa.setFitHeight(250);
-        imgMapa.setFitWidth(250);
-        //TextFields
-        txtOrigen.setPromptText("Origen");
+        txtOrigen.setPromptText("Introduce el origen");
+        txtOrigen.setPrefWidth(200);
         txtOrigen.addEventFilter(KeyEvent.KEY_RELEASED, e -> showsuggestion(txtOrigen.getText()));
-        txtDestino.setPromptText("Destino");
-        txtDestino.addEventFilter(KeyEvent.KEY_RELEASED, e -> showsuggestionDestino(txtDestino.getText()));        
+
+    
+        txtDestino.setId("txtDestino");
+        txtDestino.setPromptText("Introduce el destino");
+        txtDestino.setPrefWidth(200);
+        txtDestino.addEventFilter(KeyEvent.KEY_RELEASED, e -> showsuggestionDestino(txtDestino.getText()));
+
+    
+        txtViajeros.setId("txtViajeros");
         txtViajeros.setPromptText("Nº Viajeros");
-        //Labels
-        lblOrigen.setText("Origen");
-        lblDestino.setText("Destino");
-        //DatePicker
+        txtViajeros.setMaxWidth(100);
+    
+        datePicker.setId("datePicker");
         datePicker.setPromptText("Fecha");
         datePicker.setEditable(false);
-        mainController.dateController(datePicker);
-        //Buttons
+    
+        // Configuración de botones
+        btnBuscar.setId("btnBuscar");
         btnBuscar.setText("Buscar");
-        //Tablewiew
+    
+        btnReservar.setId("btnReservar");
+        btnReservar.setText("Reservar");
+    
+        // Configuración del WebView
+        webView.setId("webView");
+        webView.setPrefSize(300, 400); // Tamaño del WebView
+    
+        // Configuración de tabla
+        tableItinerario.setId("tableItinerario");
         tableItinerario.setPlaceholder(new Label("No se encontraron resultados"));
-        //Columnas de la tabla 
         tableItinerario.setMaxHeight(150);
-        tableItinerario.setMinWidth(530);
-        TableColumn<Itinerario, String> origenColumn = new TableColumn<>("Origen");
-        origenColumn.setCellValueFactory(new PropertyValueFactory<>("origenNombre"));
-        TableColumn<Itinerario, String> destinoColumn = new TableColumn<>("Destino");
-        destinoColumn.setCellValueFactory(new PropertyValueFactory<>("destinoNombre"));
-        TableColumn<Itinerario, String> fechaColumn = new TableColumn<>("Fecha");
-        fechaColumn.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-        TableColumn<Itinerario, String> duracionColumn = new TableColumn<>("Duracion (minutos)");
-        duracionColumn.setMinWidth(150);
-        duracionColumn.setCellValueFactory(new PropertyValueFactory<>("duracion"));
-        TableColumn<Itinerario, String> precioColumn = new TableColumn<>("Precio (€)");
-        precioColumn.setCellValueFactory(new PropertyValueFactory<>("precio"));
-
-        TableColumn<Itinerario, String> horaColumn = new TableColumn<>("H");
-        horaColumn.setCellValueFactory(new PropertyValueFactory<>("hora"));	
-        //Añadir columnas a la tabla
-        tableItinerario.getColumns().addAll(origenColumn, destinoColumn, fechaColumn, duracionColumn, precioColumn,horaColumn);
-        //Poner elementos en la gridPane(5 columnas va tener para poder poner las cosas bien)
-        gridPane.add(lblTitulo, 2, 0);
-        gridPane.add(webView, 0, 4,2,5);
-        gridPane.add(lblOrigen,0,2 );
-        gridPane.add(txtOrigen, 1, 2); //los lbl y txt en la misma fila
-        gridPane.add(lblDestino, 2, 2);
-        gridPane.add(txtDestino, 3, 2);
-        gridPane.add(datePicker, 4, 2);//date picker tambien en la misma linea
-        gridPane.add(txtViajeros, 4, 3);
-        gridPane.add(btnBuscar, 2, 3); //El boton abajo en el medio
-        gridPane.add(tableItinerario, 2, 4, 2, 5);
-        gridPane.add(btnReservar, 4,9);
+        tableItinerario.setMinWidth(400);
+        
+   if (tableItinerario.getColumns().isEmpty()) {
+         // Añadir columnas a la tabla
+         TableColumn<Itinerario, String> origenColumn = new TableColumn<>("Origen");
+         origenColumn.setCellValueFactory(new PropertyValueFactory<>("origenNombre"));
+     
+         TableColumn<Itinerario, String> destinoColumn = new TableColumn<>("Destino");
+         destinoColumn.setCellValueFactory(new PropertyValueFactory<>("destinoNombre"));
+     
+         TableColumn<Itinerario, String> fechaColumn = new TableColumn<>("Fecha");
+         fechaColumn.setCellValueFactory(new PropertyValueFactory<>("fecha"));
+     
+         TableColumn<Itinerario, String> duracionColumn = new TableColumn<>("Duración (minutos)");
+         duracionColumn.setMinWidth(150);
+         duracionColumn.setCellValueFactory(new PropertyValueFactory<>("duracion"));
+     
+         TableColumn<Itinerario, String> precioColumn = new TableColumn<>("Precio (€)");
+         precioColumn.setCellValueFactory(new PropertyValueFactory<>("precio"));
+     
+         TableColumn<Itinerario, String> horaColumn = new TableColumn<>("Hora");
+         horaColumn.setCellValueFactory(new PropertyValueFactory<>("hora"));
+     
+         tableItinerario.getColumns().addAll(origenColumn, destinoColumn, fechaColumn, duracionColumn, precioColumn, horaColumn);
+   }
+    
+        // Añadir elementos al GridPane
+        gridPane.add(lblTitulo, 1, 0, 3, 1); // Título centrado en la parte superior
+        gridPane.add(webView, 0, 1, 1, 5); // WebView a la izquierda, ocupando varias filas
+        gridPane.add(lblOrigen, 1, 1); // Etiqueta Origen
+        gridPane.add(txtOrigen, 2, 1); // Campo Origen
+        gridPane.add(lblDestino, 1, 2); // Etiqueta Destino
+        gridPane.add(txtDestino, 2, 2); // Campo Destino
+        gridPane.add(datePicker, 3, 1); // DatePicker en la misma fila de Origen
+        gridPane.add(txtViajeros, 3, 2); // Campo Viajeros en la misma fila de Destino
+        gridPane.add(btnBuscar, 2, 3); // Botón Buscar centrado en una fila nueva
+        gridPane.add(tableItinerario, 1, 4, 2, 1); // Tabla ocupa varias columnas
+        gridPane.add(btnReservar, 3, 5); // Botón Reservar al final, debajo de la tabla
+    
         return gridPane;
     }
+    
     public static void main(String[] args) {
         launch();
     }

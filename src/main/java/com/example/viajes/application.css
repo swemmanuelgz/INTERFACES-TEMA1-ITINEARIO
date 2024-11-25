@@ -1,15 +1,75 @@
-.root{
-    -fx-background-color: #A8E6CF; /* verde claro */
- 
+.root {
+    -fx-background-color: #A8E6CF; /* Fondo verde claro */
+    -fx-padding: 20px;
 }
-#lblTitulo{
+
+#lblTitulo {
     -fx-font-size: 24px;
     -fx-text-fill: #000000;
     -fx-font-weight: bold;
-    -fx-font-family: Arial;
+    -fx-font-family: Arial, sans-serif;
+    -fx-alignment: center;
 }
-#imgMapa{
+
+#imgMapa {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 5, 5);
+    -fx-border-color: #00695C;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
 }
-#txtOrigen{
-    
+
+#txtOrigen, #txtDestino, #txtViajeros, #datePicker {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #00695C;
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-font-size: 14px;
+    -fx-font-family: Arial, sans-serif;
+    -fx-pref-height: 30px;
+    -fx-pref-width: 200px;
+}
+
+#txtViajeros {
+    -fx-pref-width: 75px;
+}
+
+#btnBuscar, #btnReservar {
+    -fx-background-color: #4CAF50; /* Verde oscuro */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+    -fx-border-color: #388E3C;
+}
+
+#btnBuscar:hover, #btnReservar:hover {
+    -fx-background-color: #66BB6A; /* Verde más claro */
+    -fx-border-color: #2E7D32;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0, 2, 2);
+}
+
+#btnBuscar:pressed, #btnReservar:pressed {
+    -fx-background-color: #388E3C;
+    -fx-border-color: #1B5E20;
+    -fx-effect: none;
+}
+
+#tableItinerario {
+    -fx-border-color: #00695C;
+    -fx-border-radius: 5px;
+    -fx-background-color: #FFFFFF;
+    -fx-font-family: Arial, sans-serif;
+}
+
+.table-column-header {
+    -fx-background-color: #00695C;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #A5D6A7;
 }
