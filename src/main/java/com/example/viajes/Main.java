@@ -236,7 +236,7 @@ public class Main extends Application {
             listView.setPrefHeight(Math.min(provinciasFiltradas.size(), 5)*24); //maximo  elementos muestra
             sugestiones.getContent().clear();
             sugestiones.getContent().add(listView);
-
+            //Condicional para mostrar el popup
             if (!sugestiones.isShowing()) {
                 sugestiones.show(txtOrigen,
                 txtDestino.localToScreen(txtDestino.getBoundsInLocal()).getMinX(),
