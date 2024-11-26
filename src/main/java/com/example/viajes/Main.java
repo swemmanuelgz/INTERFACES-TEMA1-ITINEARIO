@@ -101,7 +101,7 @@ public class Main extends Application {
 
         //Thread para actualizar la tabla
         mainController.tableUpdateThread( tableItinerario);
-        
+        //Actioner
         btnBuscar.setOnAction(e -> { 
             excepciones.notSetOriginOrDestinationOrDate(txtOrigen, txtDestino, datePicker, txtViajeros);
             excepciones.notSetOriginOrDestination(txtOrigen, txtDestino);
