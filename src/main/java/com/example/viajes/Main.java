@@ -99,7 +99,7 @@ public class Main extends Application {
         mainController.onlyLetters(txtDestino);
         mainController.onlyNumbers(txtViajeros);
 
-        //Thread
+        //Thread para actualizar la tabla
         mainController.tableUpdateThread( tableItinerario);
         
         btnBuscar.setOnAction(e -> { 
